@@ -15,7 +15,7 @@ class UsersController extends Controller
      */
     public function index()
     {
-        $all = AppUser::all();
+        $all = AppUser::select('*')->paginate(10);
         return $all;
     }
 
@@ -37,7 +37,24 @@ class UsersController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'name' => 'required|string|max:191',
+            'telephone' => 'required|integer',
+            'username' => 'required|string', 
+            'dob' => 'required|string', 
+            'email' => 'required|string',
+            'password' => 'required|string'  
+        ]);
+
+        $createUser = AppUser::create([
+            'name' => $request->name,
+            'telephone' => $request->telephone,
+            'username' => $request->username,
+            'dob' => $request->dob,
+            'email' => $request->email,
+            'password' => bcrypt($request->password)
+        ]);
+        return $createUser;
     }
 
     /**
@@ -48,7 +65,10 @@ class UsersController extends Controller
      */
     public function show($id)
     {
-        return AppUser::find($id);
+        $user = AppUser::select('id', 'name', 'telephone', 'dob', 'email')
+        ->where('id', $id)
+        ->get();
+        return $user;
     }
 
     /**
@@ -71,7 +91,24 @@ class UsersController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $request->validate([
+            'name' => 'required|string|max:191',
+            'telephone' => 'required|integer',
+            'username' => 'required|string', 
+            'dob' => 'required|string', 
+            'email' => 'required|string',
+            'password' => 'required|string'  
+        ]);
+
+        $updateUser = AppUser::find($id);
+        $updateUser->name = $request->name;
+        $updateUser->telephone = $request->telephone;
+        $updateUser->username = $request->username;
+        $updateUser->dob = $request->dob;
+        $updateUser->email = $request->email;
+        $updateUser->password = bcrypt($request->password);
+        $updateUser->save();
+        return $updateUser;
     }
 
     /**
@@ -82,6 +119,9 @@ class UsersController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $deleteUser = AppUser::find($id);
+        $deleteUser->delete();
+
+        return ['Message' => 'User Deleted'];
     }
 }

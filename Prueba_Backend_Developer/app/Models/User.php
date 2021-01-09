@@ -34,6 +34,9 @@ class User extends Model implements JWTSubject
         'password', 'remember_token'
     ];
 
+    protected $casts =[
+        'telephone' => 'integer',
+    ];
         // Rest omitted for brevity
 
     /**
