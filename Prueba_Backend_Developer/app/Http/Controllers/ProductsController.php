@@ -4,9 +4,14 @@ namespace App\Http\Controllers;
 
 use App\Models\Product;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class ProductsController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth:api');
+    }
     /**
      * Display a listing of the resource.
      *
@@ -14,9 +19,11 @@ class ProductsController extends Controller
      */
     public function index()
     {
-        $allProducts = Product::select(['id', 'sku', 'name', 'quantity', 'price', 'description', 'image'])
+        //Searching thew information of all the products
+        $allProducts = Product::select(['*'])
         ->paginate(10);
-        return $allProducts;
+
+        return $allProducts;//returning the information found
     }
 
     /**
@@ -37,24 +44,32 @@ class ProductsController extends Controller
      */
     public function store(Request $request)
     {
+        //Validating the information to be saved
         $request->validate([
             'sku' => 'string',
             'name' => 'required|string',
             'quantity' => 'required|integer',
             'price' => 'required|numeric|regex:/^[\d]{0,8}(\.[\d]{1,2})?$/',
             'description' => 'string',
+            'image' => 'image|max:5000'
         ]);
-
+        //saving the image and getting its path
+        if(!($request->image)){
+            $image = null;
+        }else{
+            $image = basename(Storage::put('Products', $request->image));
+        }
+        //Creating and saving the information
         $createProduct = Product::create([
             'sku' => $request->sku,
             'name' => $request->name,
             'quantity' => $request->quantity,
             'price' => $request->price,
             'description' => $request->description,
-            'image' => $request->image
+            'image' => $image
         ]);
 
-        return $createProduct;
+        return $createProduct; //returning the information saved
     }
 
     /**
@@ -65,11 +80,12 @@ class ProductsController extends Controller
      */
     public function show($id)
     {
-        $product = Product::select('id', 'sku', 'name', 'quantity', 'price', 'description', 'image')
+         //Showing a specific product
+        $product = Product::select('*')
         ->where('id', $id)
         ->get();
-        //$product = Product::find($id);
-        return $product;
+        
+        return $product; //Returning the information found
     }
 
     /**
@@ -92,24 +108,33 @@ class ProductsController extends Controller
      */
     public function update(Request $request, $id)
     {
+        //Validation the information to be updated
         $request->validate([
             'sku' => 'string',
             'name' => 'required|string',
             'quantity' => 'required|integer',
             'price' => 'required|numeric|regex:/^[\d]{0,8}(\.[\d]{1,2})?$/',
             'description' => 'string',
+            'image' => 'image|max:5000'
         ]);
-        
-        $updateProduct = Product::find($id);
+
+        //saving the image and getting its path
+        if(!($request->image)){
+            $image = null;
+        }else{
+            $image = basename(Storage::put('Products', $request->image));
+        }
+
+        $updateProduct = Product::find($id);//finding the product's id to be updated
         $updateProduct->sku = $request->sku;
         $updateProduct->name = $request->name;
         $updateProduct->quantity = $request->quantity;
         $updateProduct->price = $request->price;
         $updateProduct->description = $request->description;
-        $updateProduct->image = $request->image;
-        $updateProduct->save();
+        $updateProduct->image = $image;
+        $updateProduct->save();//saving the information updated
 
-        return $updateProduct;
+        return $updateProduct;//Returning the information updated
 
     }
 
@@ -121,8 +146,8 @@ class ProductsController extends Controller
      */
     public function destroy($id)
     {
-        $productToDelete = Product::find($id);
-        $productToDelete->delete();
-        return ['message' => 'Product Deleted'];
+        $productToDelete = Product::find($id);//Getting the product's id to be deleted
+        $productToDelete->delete();//Deleting the product's information
+        return ['message' => 'Product Deleted'];//Retutning a final message
     }
 }

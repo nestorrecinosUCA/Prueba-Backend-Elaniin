@@ -8,6 +8,10 @@ use App\Models\User as AppUser;
 
 class UsersController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth:api', ['except' => ['store']]);
+    }
     /**
      * Display a listing of the resource.
      *
@@ -15,8 +19,11 @@ class UsersController extends Controller
      */
     public function index()
     {
-        $all = AppUser::select('*')->paginate(10);
-        return $all;
+        //Getting the information of all the users
+        $all = AppUser::select('*')
+        ->paginate(10);
+
+        return $all;//Returning the information found
     }
 
     /**
@@ -37,6 +44,7 @@ class UsersController extends Controller
      */
     public function store(Request $request)
     {
+        //Validating the information to be saved
         $request->validate([
             'name' => 'required|string|max:191',
             'telephone' => 'required|integer',
@@ -45,7 +53,8 @@ class UsersController extends Controller
             'email' => 'required|string',
             'password' => 'required|string'  
         ]);
-
+        
+        //Creating and saving the new user' information
         $createUser = AppUser::create([
             'name' => $request->name,
             'telephone' => $request->telephone,
@@ -54,7 +63,8 @@ class UsersController extends Controller
             'email' => $request->email,
             'password' => bcrypt($request->password)
         ]);
-        return $createUser;
+
+        return $createUser; //Returning the information saved.
     }
 
     /**
@@ -65,10 +75,11 @@ class UsersController extends Controller
      */
     public function show($id)
     {
-        $user = AppUser::select('id', 'name', 'telephone', 'dob', 'email')
+        //Showing a specific user
+        $user = AppUser::select('*')
         ->where('id', $id)
         ->get();
-        return $user;
+        return $user; //Returning the information found
     }
 
     /**
@@ -91,15 +102,17 @@ class UsersController extends Controller
      */
     public function update(Request $request, $id)
     {
+        //Validating the information
         $request->validate([
             'name' => 'required|string|max:191',
             'telephone' => 'required|integer',
             'username' => 'required|string', 
             'dob' => 'required|string', 
-            'email' => 'required|string',
+            'email' => 'required|email',
             'password' => 'required|string'  
         ]);
-
+        
+        //Updating the information
         $updateUser = AppUser::find($id);
         $updateUser->name = $request->name;
         $updateUser->telephone = $request->telephone;
@@ -108,7 +121,8 @@ class UsersController extends Controller
         $updateUser->email = $request->email;
         $updateUser->password = bcrypt($request->password);
         $updateUser->save();
-        return $updateUser;
+
+        return $updateUser; //Returning the information updated
     }
 
     /**
@@ -119,9 +133,9 @@ class UsersController extends Controller
      */
     public function destroy($id)
     {
-        $deleteUser = AppUser::find($id);
-        $deleteUser->delete();
+        $deleteUser = AppUser::find($id); //Finding the id of the user to be deleted
+        $deleteUser->delete(); //Deleting user information
 
-        return ['Message' => 'User Deleted'];
+        return ['Message' => 'User Deleted']; //Returning a final message
     }
 }

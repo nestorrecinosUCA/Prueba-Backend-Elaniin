@@ -2,8 +2,8 @@
 
 use App\Http\Controllers\ProductsController;
 use App\Http\Controllers\SearchesController;
-use App\Http\Controllers\TokensController;
 use App\Http\Controllers\UsersController;
+use App\Http\Controllers\AuthController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -18,7 +18,7 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-//Autenticador
+//Auth routs
 Route::group([
 
     'middleware' => 'api',
@@ -26,35 +26,36 @@ Route::group([
 
 ], function ($router) {
 
-    Route::post('login', 'AuthController@login');
-    Route::post('logout', 'AuthController@logout');
-    Route::post('refresh', 'AuthController@refresh');
-    Route::post('me', 'AuthController@me');
+    Route::post('login', [AuthController::class, 'login']);
+    Route::post('logout', [AuthController::class, 'logout']);
+    Route::post('refresh', [AuthController::class, 'refresh']);
+    Route::post('me', [AuthController::class, 'me']);
 
 });
-//Registrar usuario
-Route::post('/add', [UsersController::class, 'store']);
-//Ya cuando está registrado
+
 Route::group([
-    'middleware' => 'api',
+    
+    'middleware' => 'api'
+    
 ], function(){
     Route::prefix('/v1')->group(function(){
-        //RUTAS PARA USUARIOS
+        //Routes for users
         Route::prefix('users')->group(function (){
-            Route::get('/all', [UsersController::class, 'index']);
-            Route::get('/{id}', [UsersController::class, 'show']);
-            Route::post('/update/{id}', [UsersController::class, 'update']);
-            Route::delete('/delete/{id}', [UsersController::class, 'destroy']);
+            Route::post('/add', [UsersController::class, 'store']);//Register a new user
+            Route::get('/all', [UsersController::class, 'index']);//Ahow all the users.
+            Route::get('/{id}', [UsersController::class, 'show']);//Show just one user.
+            Route::post('/update/{id}', [UsersController::class, 'update']);//Update one user.
+            Route::delete('/delete/{id}', [UsersController::class, 'destroy']);//Delete one user.
         });
         
-        //RUTAS PARA LOS PRODUCTOS
+        //Routes for products
         Route::prefix('products')->group(function(){
-            Route::get('all', [ProductsController::class, 'index']);
-            Route::get('/{id}', [ProductsController::class, 'show']);
-            Route::post('/add', [ProductsController::class, 'store']);
-            Route::post('/update/{id}', [ProductsController::class, 'update']);
-            Route::post('/results', [SearchesController::class, 'results']);
-            Route::delete('/delete/{id}', [ProductSController::class, 'destroy']);
+            Route::get('all', [ProductsController::class, 'index']);//Show all the products.
+            Route::get('/{id}', [ProductsController::class, 'show']);//Show one product.
+            Route::post('/add', [ProductsController::class, 'store']);//Add one product
+            Route::post('/update/{id}', [ProductsController::class, 'update']);//Update one product
+            Route::post('/results', [SearchesController::class, 'results']);//get the results of the search.
+            Route::delete('/delete/{id}', [ProductSController::class, 'destroy']);//Delete one product
         });
     });
 });
