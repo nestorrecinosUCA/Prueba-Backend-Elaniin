@@ -10,10 +10,14 @@ class SearchesController extends Controller
     public function results(Request $request){
         $search = $request->search;
         $dataFounded = Product::select('*')
-        ->where('name', $search)
-        ->where('sku', $search)
+        ->where('name', 'like', "%$search%")
+        ->orWhere('sku', 'like', "%$search%")
         ->paginate(10);
-
-        return $dataFounded;
+        //$dataFounded = DB::table('products')->where('name', $search);
+        if(empty($dataFounded)){
+            return ["message" => "No founded"];
+        }else{
+            return $dataFounded;
+        }
     }
 }
