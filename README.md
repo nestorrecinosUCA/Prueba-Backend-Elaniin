@@ -3,18 +3,21 @@
 This api allows you to ask for information about users and products that have been stored in a database.
 You can create, update, delete or read information from users, you can also read, create, update and delete information about products.
 
-## Install the project
+**Install the project**
+
 First, you have to select the folder in which you will install the project.
 Once you have selected the folder, run the following comand:
 
     git clone https://github.com/nestorrecinosUCA/Prueba-Backend-Elaniin.git
 
-## Install dependences
+**Install dependences**
+
 Now that you have already installed the project, you need to install the necessary dependences that were used tu develop this project, so you can use all te functions in the best way, so, for installing the dependences, you need to change to the directory in which you save the project, and run the following comand:
 
     composer install
 
-## Configurate the .env file
+**Configurate the .env file**
+
 There is a file called .env.example which have some configurations, but it is not the one that you will use for running the project, so, you can copy that file manually and change the name to .env or you can run the following comand:
 
     copy .env.example .env
@@ -29,7 +32,8 @@ And for finishing this part, you need to create the secret key for JWT Authentic
 
     php artisan jwt:secret
 
-## Migrate and seed the database
+**Migrate and seed the database**
+
 Now that you have completed the configuration in the .env file, you need to migrate the database and its seeders for you to start using the project and for that, you have to run the following command
 
     php artisan migrate --seed
